@@ -3,6 +3,10 @@ import nltk
 from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords
 from fuzzywuzzy import fuzz
+# import spaCy
+# from word_mover_distance import model
+from gensim.models import Word2Vec
+import gensim.downloader as api
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -24,14 +28,16 @@ def clean_synset(synset):
 
 def predict_word(desc, pos):
     best_synset = None
-    best_score = 0
+    best_score = float('inf')
+
+    word_vectors = api.load("glove-wiki-gigaword-100")
 
     s1 = ' '.join(set([word for word in desc.lower().split() if word not in stopwords.words('english')]))
     for synset in wn.all_synsets(pos):
         s2 = ' '.join(set([word for word in synset.definition().lower().split() if word not in stopwords.words('english')]))
-        similarity = fuzz.token_set_ratio(s1, s2)
+        similarity = word_vectors.wmdistance(s1, s2)
 
-        if similarity > best_score:
+        if similarity < best_score:
             best_score = similarity
             best_synset = synset
 

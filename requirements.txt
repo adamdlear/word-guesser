@@ -1,2 +1,6 @@
 nltk
 fuzzywuzzy
+spacy
+word-mover-distance
+gensim
+python-Levenshtein
