@@ -1,3 +1,8 @@
+"""
+This approach to solve this problem attempts to identify the word by computing the similarity between
+the input string and each word sense's definition.
+"""
+
 import ssl
 import nltk
 from nltk.corpus import wordnet as wn
@@ -22,6 +27,10 @@ def clean_synset(synset):
     return synset.name().lower().split('.')[0].replace('_', ' ')
 
 
+def compare(description, definition):
+    return fuzz.token_set_ratio(description, definition)
+
+
 def predict_word(desc, pos):
     best_synset = None
     best_score = 0
@@ -29,7 +38,7 @@ def predict_word(desc, pos):
     s1 = ' '.join(set([word for word in desc.lower().split() if word not in stopwords.words('english')]))
     for synset in wn.all_synsets(pos):
         s2 = ' '.join(set([word for word in synset.definition().lower().split() if word not in stopwords.words('english')]))
-        similarity = fuzz.token_set_ratio(s1, s2)
+        similarity = compare(s1, s2)
 
         if similarity > best_score:
             best_score = similarity
